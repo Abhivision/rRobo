@@ -1,9 +1,12 @@
+if("RPostgreSQL" %in% rownames(installed.packages()) == FALSE) {install.packages("RPostgreSQL")}
+if("data.table" %in% rownames(installed.packages()) == FALSE) {install.packages("data.table")}
+if("reshape" %in% rownames(installed.packages()) == FALSE) {install.packages("reshape")}
+if("igraph" %in% rownames(installed.packages()) == FALSE) {install.packages("igraph")}
+
 library(igraph)
-# library(rgl)
 library(data.table)
 library(RPostgreSQL)
 library(reshape)
-# setwd("~/Google Drive/Data at TWI/Pursuits/Robo advice")
 
 drv <- dbDriver("PostgreSQL")
 db <- dbConnect(drv, dbname="roboadvisordb", host= "localhost", port=5432, 
@@ -95,7 +98,6 @@ allData <- allData[with(allData, order(Date)), ]
   g<-graph(edges, n=max(edges), directed = TRUE)
   g<-set.vertex.attribute(g, "name", value=colnames(closePriceLog)[1:stockNum])
   gmst <- mst(g,weights = weights)
-  # plot(gmst,vertex.size = 8,edge.arrow.size=0.5)
   
   ## prepare to export results to db
   mstEdges <- data.frame(get.edgelist(gmst))
@@ -115,11 +117,7 @@ allData <- allData[with(allData, order(Date)), ]
     mstEdges[i,3] <- coefficients[1,i]
     mstEdges[i,4] <- coefficients[2,i]
   }
-  
-  # write.csv(mstEdges,file = "mstEdges.csv")
-  # write.csv(closePriceLogDiff,file = "closePriceLogDiff.csv")
-  # write.csv(corMatrix,file = "correlationMatrix.csv")
-  
+
   ## save results to db
   drv <- dbDriver("PostgreSQL")
   db <- dbConnect(drv, dbname="roboadvisordb", host= "localhost", port=5432, 

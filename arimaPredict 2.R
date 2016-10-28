@@ -1,4 +1,8 @@
-# setwd("~/Google Drive/Data at TWI/Pursuits/Robo advice")
+if("RPostgreSQL" %in% rownames(installed.packages()) == FALSE) {install.packages("RPostgreSQL")}
+if("data.table" %in% rownames(installed.packages()) == FALSE) {install.packages("data.table")}
+if("reshape" %in% rownames(installed.packages()) == FALSE) {install.packages("reshape")}
+if("jsonlite" %in% rownames(installed.packages()) == FALSE) {install.packages("jsonlite")}
+
 library(RPostgreSQL)
 library(data.table)
 library(reshape)
@@ -56,9 +60,7 @@ colnames(coefficients) <- paste("stock",arimaJSONdf$asset_id,sep = "")
 predictionDF <- logReturnTrunk[1,] * 0
 for (stock_id in colnames(predictionDF)) {
   predictionDF[1,stock_id] <- (sum(logReturnTrunk[stock_id] * coefficients[stock_id]))
-  # +  ifelse(length(newsEffect[asset_id==stock_id,effect])==0,0,newsEffect[asset_id==stock_id,effect]) 
 }
-# predictionDF[1,"stock10"] <- 0
 
 ## add news effect
 for (stock_id in colnames(predictionDF)) {
@@ -80,11 +82,6 @@ drv <- dbDriver("PostgreSQL")
 db <- dbConnect(drv, dbname="roboadvisordb", host= "localhost", port=5432, 
                 user="robouser", password="password")
 
-# for (stock_id in colnames(predictionDF)) {
-#   temp <- as.character(max(stockInfo$timestamp+(3600*24)))
-#   q = paste("update assetdata set prediction=",tomorrowPrice[1,stock_id,with=F]," where asset_id=",stock_id," AND timestamp=\"",max(stockInfo$timestamp+(3600*24)),"\"",sep = "")
-#   print(dbGetQuery(db, q))
-# }
 
 for (stock_id in colnames(tomorrowPrice[,2:ncol(tomorrowPrice),with=F])) {
   # print(stock_id)

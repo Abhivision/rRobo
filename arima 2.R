@@ -1,4 +1,8 @@
-# setwd("~/Google Drive/Data at TWI/Pursuits/Robo advice")
+if("RPostgreSQL" %in% rownames(installed.packages()) == FALSE) {install.packages("RPostgreSQL")}
+if("data.table" %in% rownames(installed.packages()) == FALSE) {install.packages("data.table")}
+if("reshape" %in% rownames(installed.packages()) == FALSE) {install.packages("reshape")}
+if("jsonlite" %in% rownames(installed.packages()) == FALSE) {install.packages("jsonlite")}
+
 library(RPostgreSQL)
 library(data.table)
 library(reshape)
