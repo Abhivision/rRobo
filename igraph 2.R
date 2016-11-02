@@ -9,8 +9,7 @@ library(RPostgreSQL)
 library(reshape)
 
 drv <- dbDriver("PostgreSQL")
-db <- dbConnect(drv, dbname="roboadvisordb", host= "localhost", port=5432, 
-                user="robouser", password="password")
+db <- dbConnect(drv, dbname="postgres", host="localhost", port=5432,  user="postgres")
 
 #read data from db
 q <- "select * from asset"
@@ -120,11 +119,9 @@ allData <- allData[with(allData, order(Date)), ]
 
   ## save results to db
   drv <- dbDriver("PostgreSQL")
-  db <- dbConnect(drv, dbname="roboadvisordb", host= "localhost", port=5432, 
-                  user="robouser", password="password")
-  
+  db <- dbConnect(drv, dbname="postgres", host="localhost" , port=5432,  user="postgres")
   dbWriteTable(db,"minimum_spanning_tree_model",mstEdges,overwrite=TRUE,row.names=FALSE)
-  
+    
   dbDisconnect(db)
   dbUnloadDriver(drv)
   

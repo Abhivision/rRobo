@@ -11,9 +11,7 @@ library(jsonlite)
 ## Loading data and taking relevant subset (of stocks having all data points without NAs)
 # allData <- fread("nyseClosingPrice.csv")
 drv <- dbDriver("PostgreSQL")
-db <- dbConnect(drv, dbname="roboadvisordb", host= "localhost", port=5432, 
-                user="robouser", password="password")
-
+db <- dbConnect(drv, dbname="postgres", host= "localhost", port=5432,  user="postgres")
 #read data from db
 q <- "select * from asset"
 assets <- data.table(dbGetQuery(db, q))
@@ -82,9 +80,7 @@ arimaJSONdf$asset_id <- arimaModelToDB$stock_id
 colnames(arimaJSONdf)[1] <- c("coefficients")
 
 drv <- dbDriver("PostgreSQL")
-db <- dbConnect(drv, dbname="roboadvisordb", host= "localhost", port=5432, 
-                user="robouser", password="password")
-
+db <- dbConnect(drv, dbname="postgres", host= "localhost", port=5432,  user="postgres")
 # arimaJSON <- toJSON(arimaModelToDB)
 
 dbWriteTable(db,"time_series_model",arimaJSONdf,overwrite=TRUE,row.names=FALSE)

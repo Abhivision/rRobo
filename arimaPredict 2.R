@@ -9,8 +9,7 @@ library(reshape)
 library(jsonlite)
 
 drv <- dbDriver("PostgreSQL")
-db <- dbConnect(drv, dbname="roboadvisordb", host= "localhost", port=5432, 
-                user="robouser", password="password")
+db <- dbConnect(drv, dbname="postgres", host= "localhost", port=5432,  user="postgres")
 
 #read data from db
 q <- "select * from assetdata";
@@ -79,9 +78,7 @@ colnames(tomorrowPrice) <- substr(colnames(tomorrowPrice),6,nchar(colnames(tomor
 
 ## write prediction to db
 drv <- dbDriver("PostgreSQL")
-db <- dbConnect(drv, dbname="roboadvisordb", host= "localhost", port=5432, 
-                user="robouser", password="password")
-
+db <- dbConnect(drv, dbname="postgres", host= "localhost", port=5432,  user="postgres")
 
 for (stock_id in colnames(tomorrowPrice[,2:ncol(tomorrowPrice),with=F])) {
   # print(stock_id)

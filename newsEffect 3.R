@@ -8,8 +8,7 @@ library(reshape)
 
 #list of edges in mst
 drv <- dbDriver("PostgreSQL")
-db <- dbConnect(drv, dbname="roboadvisordb", host= "localhost", port=5432, 
-                user="robouser", password="password")
+db <- dbConnect(drv, dbname="postgres", host="localhost", port=5432,  user="postgres")
 
 q <- "select * from news_group"
 news <- data.table(dbGetQuery(db, q))
@@ -97,8 +96,7 @@ for (stock in news$assetId_id) {
 colnames(netEffect) <- substr(colnames(netEffect),6,nchar(colnames(netEffect)))
 
 drv <- dbDriver("PostgreSQL")
-db <- dbConnect(drv, dbname="roboadvisordb", host= "localhost", port=5432, 
-                user="robouser", password="password")
+db <- dbConnect(drv, dbname="postgres", host= "localhost", port=5432,  user="postgres")
 
 for (stock_id in colnames(netEffect)) {
   q = paste("update assetdata set neteffect =",netEffect[1,stock_id]," where asset_id = ",stock_id," AND timestamp = \'",max(stockInfo$timestamp-(19800)),"\'",sep = "")
