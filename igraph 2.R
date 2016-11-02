@@ -1,8 +1,3 @@
-if("RPostgreSQL" %in% rownames(installed.packages()) == FALSE) {install.packages("RPostgreSQL")}
-if("data.table" %in% rownames(installed.packages()) == FALSE) {install.packages("data.table")}
-if("reshape" %in% rownames(installed.packages()) == FALSE) {install.packages("reshape")}
-if("igraph" %in% rownames(installed.packages()) == FALSE) {install.packages("igraph")}
-
 library(igraph)
 library(data.table)
 library(RPostgreSQL)

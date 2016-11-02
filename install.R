@@ -1,0 +1,5 @@
+install.packages("RPostgreSQL")
+install.packages("data.table")
+install.packages("reshape")
+install.packages("igraph")
+install.packages("jsonlite")
