@@ -88,14 +88,14 @@ drv <- dbDriver("PostgreSQL")
 db <- dbConnect(drv, dbname="postgres", host= "localhost", port=5432,  user="postgres")
 
 for (stock_id in colnames(netEffect)) {
-  q = paste("update assetdata set neteffect =",netEffect[1,stock_id]," where asset_id = ",stock_id," AND timestamp = \'",max(stockInfo$timestamp),"\'",sep = "")
+  q = paste("update assetdata set neteffect =",netEffect[1,stock_id]," where asset_id = ",stock_id," AND timestamp = \'",max(stockInfo$timestamp)-19800,"\'",sep = "")
   print(dbGetQuery(db, q))
 }
 
 for (i in 1:nrow(rippleEffectLinks)) {
   q = paste("insert into ripple_effect (result,asset_id_one_id,asset_id_two,timestamp) values (", rippleEffectLinks[i,]$effect, ",",
             rippleEffectLinks[i,]$source_id, ",", rippleEffectLinks[i,]$target_id, ", \'",
-            max(stockInfo$timestamp),"\'", ")")
+            max(stockInfo$timestamp)-19800,"\'", ")")
   print(dbGetQuery(db, q))
 }
 

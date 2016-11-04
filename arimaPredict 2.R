@@ -80,10 +80,10 @@ drv <- dbDriver("PostgreSQL")
 db <- dbConnect(drv, dbname="postgres", host= "localhost", port=5432,  user="postgres")
 
 for (stock_id in colnames(tomorrowPrice[,2:ncol(tomorrowPrice),with=F])) {
-  q = paste("update assetdata set prediction =",tomorrowPrice[1,stock_id,with=F]," where asset_id = ",stock_id," AND timestamp = \'",max(stockInfo$timestamp),"\'",sep = "")
+  q = paste("update assetdata set prediction =",tomorrowPrice[1,stock_id,with=F]," where asset_id = ",stock_id," AND timestamp = \'",max(stockInfo$timestamp)-19800,"\'",sep = "")
   print(dbGetQuery(db, q))
   
-  q = paste("update assetdata set arimaeffect =",arimaPredictionDF[1,stock_id]," where asset_id = ",stock_id," AND timestamp = \'",max(stockInfo$timestamp),"\'",sep = "")
+  q = paste("update assetdata set arimaeffect =",arimaPredictionDF[1,stock_id]," where asset_id = ",stock_id," AND timestamp = \'",max(stockInfo$timestamp)-19800,"\'",sep = "")
   print(dbGetQuery(db, q))
 }
 
