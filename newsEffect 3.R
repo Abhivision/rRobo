@@ -29,14 +29,7 @@ mstEdges$assetIdOne_id <- paste("stock",mstEdges$assetIdOne_id,sep = "")
 mstEdges$assetIdTwo <- paste("stock",mstEdges$assetIdTwo,sep = "")
 
 
-
-#mstEdges <- read.csv("mstEdges.csv")
-#mstEdges$X <- NULL
-#closePriceLogDiff <- read.csv("closePriceLogDiff.csv")
-#closePriceLogDiff$X<- NULL
 numStocks <- ncol(stockPrice)-1
-#latestLogReturns <- closePriceLogDiff[1,1:40]
-#latestLogReturns <- c(latestLogReturns[1,])
 
 newsEffect <- function(stockName,effect=0.005) {
   #create list of 40 zeroes to depict effect due to news for each of 40 stocks
@@ -71,23 +64,23 @@ newsEffect <- function(stockName,effect=0.005) {
 
 
 # loop over all assets to predict
+rippleEffectLinks <- data.frame(source_id=character(),target_id=character(),effect=double())
 netEffect <- as.list(stockPrice[1,2:(numStocks+1)])
 netEffect[1:numStocks] <- 0
 netEffect <- data.frame(netEffect)
 for (stock in news$assetId_id) {
   temp <- newsEffect(stock,news[assetId_id==stock,]$effect)
   for (colname in colnames(netEffect)) {
+    ifelse(stock!=colname,
+           rippleEffectLinks <- rbind(rippleEffectLinks,
+                                      data.frame(source_id=substr(stock,6,nchar(stock)),target_id=substr(colname,6,nchar(colname)),
+                                                 effect=temp[[colname]])),print("")) 
     netEffect[1,colname] <- netEffect[1,colname] + temp[[colname]]
   }
 }
 
-# for (stock in colnames(netEffect)) {
-#   altName <- substr(stock,6,nchar(stock))
-#   temp <- newsEffect(stock,news[assetId_id==assetId_id,]$effect)
-#   for (colname in colnames(netEffect)) {
-#     netEffect[1,colname] <- netEffect[1,colname] + temp[[colname]]
-#   }
-# }
+rippleEffectLinks <- rippleEffectLinks[rippleEffectLinks$effect!=0,]
+rippleEffectLinks <- aggregate(effect ~ source_id + target_id, rippleEffectLinks, FUN = sum)
 
 colnames(netEffect) <- substr(colnames(netEffect),6,nchar(colnames(netEffect)))
 
@@ -95,23 +88,19 @@ drv <- dbDriver("PostgreSQL")
 db <- dbConnect(drv, dbname="postgres", host= "localhost", port=5432,  user="postgres")
 
 for (stock_id in colnames(netEffect)) {
-  q = paste("update assetdata set neteffect =",netEffect[1,stock_id]," where asset_id = ",stock_id," AND timestamp = \'",max(stockInfo$timestamp-(19800)),"\'",sep = "")
+  q = paste("update assetdata set neteffect =",netEffect[1,stock_id]," where asset_id = ",stock_id," AND timestamp = \'",max(stockInfo$timestamp),"\'",sep = "")
+  print(dbGetQuery(db, q))
+}
+
+for (i in 1:nrow(rippleEffectLinks)) {
+  q = paste("insert into ripple_effect (result,asset_id_one_id,asset_id_two,timestamp) values (", rippleEffectLinks[i,]$effect, ",",
+            rippleEffectLinks[i,]$source_id, ",", rippleEffectLinks[i,]$target_id, ", \'",
+            max(stockInfo$timestamp),"\'", ")")
   print(dbGetQuery(db, q))
 }
 
 dbDisconnect(db)
 dbUnloadDriver(drv)
 
-# c <- data.frame(newsEffect("ADX",-0.05))
-# 
-# ## Convert result to price prediction
-# pricePrediction <- c
-# for (stockName in colnames(c)) {
-#   ## new closing price according to prediction
-#   pricePrediction[1,stockName] <- 10^(log10(closePrice[1,stockName]) + c[1,stockName])
-#   ## percentage change in price
-#   pricePrediction[2,stockName] <- 100*(pricePrediction[1,stockName] - 
-#                                      closePrice[1,stockName])/closePrice[1,stockName]
-# }
 rm(list=ls())
 

@@ -56,6 +56,9 @@ for (stock_id in colnames(predictionDF)) {
   predictionDF[1,stock_id] <- (sum(logReturnTrunk[stock_id] * coefficients[stock_id]))
 }
 
+## store timeseries prediction in seperate variable for waterfall visualization
+arimaPredictionDF <- predictionDF
+
 ## add news effect
 for (stock_id in colnames(predictionDF)) {
   stock_id_temp <- substr(stock_id,6,nchar(stock_id))
@@ -70,17 +73,18 @@ for (asset_id in colnames(predictionDF)) {
   tomorrowPrice[1,asset_id] <- 10^(predictionDF[1,asset_id] + log10(todayPrice[1,asset_id,with=F]))
 }
 colnames(tomorrowPrice) <- substr(colnames(tomorrowPrice),6,nchar(colnames(tomorrowPrice)))
+colnames(arimaPredictionDF) <- substr(colnames(arimaPredictionDF),6,nchar(colnames(arimaPredictionDF)))
 
 ## write prediction to db
 drv <- dbDriver("PostgreSQL")
 db <- dbConnect(drv, dbname="postgres", host= "localhost", port=5432,  user="postgres")
 
 for (stock_id in colnames(tomorrowPrice[,2:ncol(tomorrowPrice),with=F])) {
-  # print(stock_id)
-  temp <- as.character(max(stockInfo$timestamp-(19800)))
-  q = paste("update assetdata set prediction =",tomorrowPrice[1,stock_id,with=F]," where asset_id = ",stock_id," AND timestamp = \'",max(stockInfo$timestamp-(19800)),"\'",sep = "")
+  q = paste("update assetdata set prediction =",tomorrowPrice[1,stock_id,with=F]," where asset_id = ",stock_id," AND timestamp = \'",max(stockInfo$timestamp),"\'",sep = "")
   print(dbGetQuery(db, q))
-  # print(q)
+  
+  q = paste("update assetdata set arimaeffect =",arimaPredictionDF[1,stock_id]," where asset_id = ",stock_id," AND timestamp = \'",max(stockInfo$timestamp),"\'",sep = "")
+  print(dbGetQuery(db, q))
 }
 
 #disconnect from db
