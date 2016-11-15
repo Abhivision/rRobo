@@ -114,7 +114,7 @@ allData <- allData[with(allData, order(Date)), ]
 
   ## save results to db
   drv <- dbDriver("PostgreSQL")
-  db <- dbConnect(drv, dbname="postgres", host="localhost" , port=5432,  user="postgres")
+  db <- dbConnect(drv, dbname="postgres", host="localhost", port=5432,  user="postgres")
   dbWriteTable(db,"minimum_spanning_tree_model",mstEdges,overwrite=TRUE,row.names=FALSE)
     
   dbDisconnect(db)
